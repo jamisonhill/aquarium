@@ -59,6 +59,7 @@ export interface FishPalette {
   patternColor2?: string;
   iridescence: number;   // 0..1 — adds metallic sheen in the material
   patternParams?: number[]; // pattern-specific tuning (e.g. bar count)
+  eyeColor?: string;     // iris color override (albino fish have red eyes)
 }
 
 export interface SwimParams {

@@ -19,6 +19,18 @@ import { radialSpriteTexture } from './textures';
 import { applyUnderwater } from './shaders';
 
 const TAU = Math.PI * 2;
+
+// Global pace dial. The per-species cruise speeds follow published
+// body-lengths-per-second figures, but in a small on-screen tank that reads
+// far too frantic — half speed is much closer to how a real tank feels.
+// Tail-beat frequency derives from actual speed, so the animation slows with it.
+const SPEED_SCALE = 0.5;
+
+// Surface crawlers stick to the glass/floor instead of swimming freely:
+// snails graze slowly; hillstream loaches cling and scoot in little bursts.
+function isCrawler(sp: SpeciesDef): boolean {
+  return sp.id.includes('snail') || sp.id.includes('hillstream');
+}
 const _v1 = new THREE.Vector3();
 const _v2 = new THREE.Vector3();
 const _v3 = new THREE.Vector3();
@@ -61,6 +73,8 @@ interface Agent {
   // Critter-specific
   wall?: 'floor' | 'back' | 'left' | 'right';
   crawlDir?: number;
+  // Corydoras air-gulp state: rocketing 'up' to the surface or diving 'down'.
+  gulp?: 'up' | 'down';
 }
 
 interface Population {
@@ -227,13 +241,11 @@ export class FishSystem {
       prevYaw: 0,
       hunger: 0,
     };
-    if (sp.invert) {
-      if (sp.id.includes('snail')) {
-        // Snails split between the glass and the floor ("grazing the glass").
-        const walls = ['floor', 'back', 'left', 'right'] as const;
-        agent.wall = walls[i % walls.length];
-        agent.crawlDir = Math.random() * TAU;
-      }
+    if (isCrawler(sp)) {
+      // Crawlers split between the glass and the floor ("grazing the glass").
+      const walls = ['floor', 'back', 'left', 'right'] as const;
+      agent.wall = walls[i % walls.length];
+      agent.crawlDir = Math.random() * TAU;
     }
     return agent;
   }
@@ -275,7 +287,7 @@ export class FishSystem {
     for (const pop of this.populations) {
       const { sp, agents, mesh, dyn } = pop;
       for (const a of agents) {
-        if (sp.invert && sp.id.includes('snail')) this.updateSnail(a, dt, env);
+        if (isCrawler(sp)) this.updateCrawler(a, dt, env);
         else this.updateFish(a, agents, dt, env);
         this.writeInstance(pop, a, dt);
       }
@@ -288,7 +300,7 @@ export class FishSystem {
   private updateFish(a: Agent, school: Agent[], dt: number, env: SimEnv): void {
     const sp = a.sp;
     const L = a.scale;
-    const cruise = sp.swim.cruise * L;      // body-lengths/s → m/s
+    const cruise = sp.swim.cruise * L * SPEED_SCALE; // body-lengths/s → m/s
     const maxSpeed = cruise * sp.swim.burst;
 
     // — Activity by time of day: nocturnal species invert the rhythm —
@@ -320,9 +332,29 @@ export class FishSystem {
     }
 
     // 3) Depth-band preference — a soft pull back into the species' layer.
-    const [y0, y1] = this.zoneBand(sp, env);
-    if (a.pos.y < y0) steer.y += (y0 - a.pos.y) * 1.6;
-    if (a.pos.y > y1) steer.y -= (a.pos.y - y1) * 1.6;
+    //    Suspended during an air-gulp run: the whole point is leaving the zone.
+    if (!a.gulp) {
+      const [y0, y1] = this.zoneBand(sp, env);
+      if (a.pos.y < y0) steer.y += (y0 - a.pos.y) * 1.6;
+      if (a.pos.y > y1) steer.y -= (a.pos.y - y1) * 1.6;
+    }
+
+    // Air-gulp phase transitions: reached the surface → gulp, dive back down;
+    // reached the bottom again → settle back into foraging.
+    if (a.gulp === 'up' && a.pos.y > env.surfaceY - L * 2.2) {
+      a.gulp = 'down';
+      a.mode = 'dart';
+      a.modeT = 3;
+      a.anchor.set(
+        a.pos.x + (Math.random() - 0.5) * 0.1,
+        env.floorY + L,
+        a.pos.z + (Math.random() - 0.5) * 0.1
+      );
+    } else if (a.gulp === 'down' && a.pos.y < env.floorY + L * 2) {
+      a.gulp = undefined;
+      a.mode = 'forage';
+      a.modeT = 2 + Math.random() * 3;
+    }
 
     // 4) Boids for schooling species (RESEARCH.md §3.3).
     if (sp.archetype === 'schooler' && school.length > 1) {
@@ -341,7 +373,7 @@ export class FishSystem {
         const d = _v2.length();
         if (d < L * 0.55) {
           this.food.eat(target);          // gulp!
-          a.modeT = 0.3; a.mode = 'feed';
+          a.modeT = 0.3; a.mode = 'feed'; a.gulp = undefined;
         } else {
           steer.addScaledVector(_v2.divideScalar(d), 2.2); // urgent seek
         }
@@ -379,8 +411,9 @@ export class FishSystem {
     } else {
       a.vel.set(0.01, 0, 0);
     }
-    // Fish barely pitch — flatten vertical motion a little.
-    a.vel.y *= 1 - 0.6 * dt;
+    // Fish barely pitch — flatten vertical motion a little (except a cory
+    // rocketing for air, which climbs as steeply as it likes).
+    if (!a.gulp) a.vel.y *= 1 - 0.6 * dt;
 
     a.pos.addScaledVector(a.vel, dt);
 
@@ -406,10 +439,17 @@ export class FishSystem {
         if (a.mode === 'cruise') this.newAnchorNear(a, env, 0.6);
         break;
       case 'bottom':
+        a.gulp = undefined;
         a.mode = r < 0.55 ? 'forage' : 'cruise';
         a.modeT = 2 + Math.random() * 5;
-        if (r > 0.93 && sp.id === 'corydoras') { a.mode = 'dart'; a.anchor.y = env.surfaceY - 0.05; a.modeT = 1.2; } // air gulp dash!
-        else this.newAnchorNear(a, env, 0.4);
+        if (r > 0.9 && sp.id.includes('corydoras')) {
+          // The famous cory air gulp: rocket straight to the surface, grab a
+          // mouthful of air, then dive right back to the bottom.
+          a.mode = 'dart';
+          a.gulp = 'up';
+          a.anchor.set(a.pos.x, env.surfaceY - 0.02, a.pos.z);
+          a.modeT = 5;
+        } else this.newAnchorNear(a, env, 0.4);
         break;
       case 'hoverer':
         a.mode = r < 0.6 ? 'rest' : 'cruise';
@@ -492,7 +532,10 @@ export class FishSystem {
 
   private archetypeSteer(a: Agent, steer: THREE.Vector3, env: SimEnv, activity: number): void {
     // Pull toward the current anchor (territory point, forage spot, shelter…).
-    const anchorPull = { schooler: 0.15, solitary: 0.6, bottom: 0.8, hoverer: 0.5, ambusher: 1.4, nocturnal: 0.9, surface: 0.2, cleaner: 1.6 }[a.sp.archetype];
+    // An air-gulp run pulls MUCH harder — it's a sprint, not a stroll.
+    const anchorPull = a.gulp
+      ? 3.5
+      : { schooler: 0.15, solitary: 0.6, bottom: 0.8, hoverer: 0.5, ambusher: 1.4, nocturnal: 0.9, surface: 0.2, cleaner: 1.6 }[a.sp.archetype];
     _v2.copy(a.anchor).sub(a.pos);
     const d = _v2.length();
     if (d > 0.05) steer.addScaledVector(_v2.divideScalar(d), anchorPull * Math.min(1, d * 2));
@@ -507,21 +550,33 @@ export class FishSystem {
     }
   }
 
-  // ── Snails: crawl slowly across glass or substrate ──
-  private updateSnail(a: Agent, dt: number, env: SimEnv): void {
-    const speed = 0.006;
+  // ── Crawlers: snails & hillstream loaches on glass or substrate ──
+  private updateCrawler(a: Agent, dt: number, env: SimEnv): void {
+    // Snails ooze along; hillstream loaches graze in place, then scoot.
+    const isLoach = a.sp.id.includes('hillstream');
+    let speed = 0.004;
+    if (isLoach) {
+      a.modeT -= dt;
+      if (a.modeT <= 0) {
+        // Alternate long grazing pauses with short darts across the glass.
+        a.mode = a.mode === 'dart' ? 'forage' : 'dart';
+        a.modeT = a.mode === 'dart' ? 0.5 + Math.random() : 3 + Math.random() * 6;
+        if (a.mode === 'dart') a.crawlDir = Math.random() * TAU;
+      }
+      speed = a.mode === 'dart' ? 0.06 : 0.003;
+    }
     a.crawlDir! += (Math.random() - 0.5) * dt * 0.8;
     const dir = a.crawlDir!;
     if (a.wall === 'floor') {
       a.pos.y = env.floorY + 0.002;
-      a.pos.x += Math.cos(dir) * speed * dt * 10;
-      a.pos.z += Math.sin(dir) * speed * dt * 10;
+      a.pos.x += Math.cos(dir) * speed * dt;
+      a.pos.z += Math.sin(dir) * speed * dt;
       a.pos.x = THREE.MathUtils.clamp(a.pos.x, -env.halfW * 0.95, env.halfW * 0.95);
       a.pos.z = THREE.MathUtils.clamp(a.pos.z, -env.halfD * 0.95, env.halfD * 0.95);
     } else {
       // Glass grazing: constrained to a wall plane, crawling in 2D.
-      const u = Math.cos(dir) * speed * dt * 10;
-      const v = Math.sin(dir) * speed * dt * 10;
+      const u = Math.cos(dir) * speed * dt;
+      const v = Math.sin(dir) * speed * dt;
       if (a.wall === 'back') { a.pos.z = -env.halfD + 0.006; a.pos.x += u; a.pos.y += v; }
       if (a.wall === 'left') { a.pos.x = -env.halfW + 0.006; a.pos.z += u; a.pos.y += v; }
       if (a.wall === 'right') { a.pos.x = env.halfW - 0.006; a.pos.z += u; a.pos.y += v; }
@@ -531,7 +586,8 @@ export class FishSystem {
       // Bounce the crawl direction at the edges so they keep moving.
       if (a.pos.y >= env.surfaceY - 0.041 || a.pos.y <= env.floorY + 0.031) a.crawlDir! = -dir;
     }
-    a.vel.set(Math.cos(dir), 0, Math.sin(dir)).multiplyScalar(0.001);
+    // Velocity is only used for orientation + tail-beat pacing here.
+    a.vel.set(Math.cos(dir), 0, Math.sin(dir)).multiplyScalar(Math.max(speed, 0.001));
   }
 
   // Compose the instance matrix + shader attributes for one agent.
@@ -540,15 +596,18 @@ export class FishSystem {
     const speed = a.vel.length();
 
     let yaw: number, pitch: number, up: THREE.Vector3 | null = null;
-    if (sp.invert && sp.id.includes('snail') && a.wall && a.wall !== 'floor') {
-      // Snails on glass: orient shell "up" along the wall normal.
+    if (isCrawler(sp) && a.wall && a.wall !== 'floor') {
+      // On the glass: belly against the pane (local +Y along the wall normal),
+      // nose pointing along the crawl direction within the pane.
       yaw = a.crawlDir!;
       pitch = 0;
       up = _v3.set(a.wall === 'back' ? 0 : a.wall === 'left' ? 1 : -1, 0, a.wall === 'back' ? 1 : 0);
     } else {
       yaw = Math.atan2(-a.vel.z, a.vel.x);
       pitch = Math.asin(THREE.MathUtils.clamp(speed > 1e-5 ? a.vel.y / speed : 0, -1, 1));
-      pitch = THREE.MathUtils.clamp(pitch, -0.5, 0.5);
+      // Normal swimming stays near level; an air-gulping cory points steeply.
+      const maxPitch = a.gulp ? 1.25 : 0.5;
+      pitch = THREE.MathUtils.clamp(pitch, -maxPitch, maxPitch);
     }
 
     // Bank into turns: roll proportional to yaw rate × speed (RESEARCH.md §3.2).
@@ -574,7 +633,7 @@ export class FishSystem {
     const f = sp.swim.freqBase * 0.35 + speed / (0.7 * L + 1e-6);
     a.phase += TAU * Math.min(f, 14) * dt;
     // Pectoral flutter fades in as forward speed fades out.
-    const speedFactor = THREE.MathUtils.clamp(speed / (sp.swim.cruise * L + 1e-6), 0, 1);
+    const speedFactor = THREE.MathUtils.clamp(speed / (sp.swim.cruise * L * SPEED_SCALE + 1e-6), 0, 1);
     a.flap = THREE.MathUtils.damp(a.flap, 1 - speedFactor * 0.85, 4, dt);
 
     pop.dyn.setXYZ(a.index, a.phase, a.bend, a.flap);

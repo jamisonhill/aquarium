@@ -136,7 +136,7 @@ function fishTextureWithEye(sp: SpeciesDef): THREE.Texture {
   const ex = W * 0.115, ey = H * (1 - 0.62), r = H * sp.shape.eyeSize * 2.4;
   ctx.fillStyle = '#d8d2c0';
   ctx.beginPath(); ctx.arc(ex, ey, r * 1.25, 0, TAU); ctx.fill();
-  ctx.fillStyle = '#0a0a0c';
+  ctx.fillStyle = sp.palette.eyeColor ?? '#0a0a0c';
   ctx.beginPath(); ctx.arc(ex, ey, r * 0.85, 0, TAU); ctx.fill();
   ctx.fillStyle = 'rgba(255,255,255,0.9)';
   ctx.beginPath(); ctx.arc(ex - r * 0.3, ey - r * 0.3, r * 0.28, 0, TAU); ctx.fill();

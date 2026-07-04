@@ -46,6 +46,18 @@ export const SPECIES: SpeciesDef[] = [
     swim: swim({ cruise: 1.5, freqBase: 2.9, turnRate: 3.2 }),
   },
   {
+    id: 'ember-tetra', common: 'Ember Tetra', scientific: 'Hyphessobrycon amandae',
+    water: 'freshwater', adultSizeIn: 0.8, lengthM: 0.02,
+    temperament: 'peaceful', careLevel: 'easy', zone: 'mid', archetype: 'schooler',
+    minGroup: 8, bioload: 0.4, minGallons: 5,
+    habitat: 'Slow, tannin-stained tributaries of the Araguaia River basin in Brazil.',
+    funFact: 'It was named for Amanda Bleher, the discoverer’s mother — a tiny glowing coal of a fish that looks best in a big group over dark substrate.',
+    colorTags: ['orange', 'red'],
+    shape: shape({ height: 0.3, noseSharp: 0.3, tailFork: 0.55, eyeSize: 0.08 }),
+    palette: pal({ base: '#e8702a', belly: '#f0a878', back: '#d85a1e', pattern: 'none', fin: '#e88a4a', finOpacity: 0.45, iridescence: 0.5 }),
+    swim: swim({ cruise: 1.4, freqBase: 3.2, turnRate: 3.6 }),
+  },
+  {
     id: 'rummynose-tetra', common: 'Rummynose Tetra', scientific: 'Hemigrammus rhodostomus',
     water: 'freshwater', adultSizeIn: 2, lengthM: 0.048,
     temperament: 'peaceful', careLevel: 'moderate', zone: 'mid', archetype: 'schooler',
@@ -175,7 +187,19 @@ export const SPECIES: SpeciesDef[] = [
     colorTags: ['bronze', 'green'],
     shape: shape({ height: 0.38, width: 0.55, noseSharp: 0.6, tailFork: 0.5, dorsalHeight: 0.55, barbels: true, eyeSize: 0.06 }),
     palette: pal({ base: '#b09a6a', belly: '#e0d2b0', back: '#6a5a3a', pattern: 'none', iridescence: 0.5, fin: '#c8b890', finOpacity: 0.5 }),
-    swim: swim({ cruise: 0.9, freqBase: 2.4, mode: 1, turnRate: 3.0 }),
+    swim: swim({ cruise: 0.9, burst: 6, freqBase: 2.4, mode: 1, turnRate: 3.0 }), // high burst = rocket air-gulp dashes
+  },
+  {
+    id: 'albino-corydoras', common: 'Albino Corydoras', scientific: 'Corydoras aeneus (albino)',
+    water: 'freshwater', adultSizeIn: 2.5, lengthM: 0.055,
+    temperament: 'peaceful', careLevel: 'easy', zone: 'bottom', archetype: 'bottom',
+    minGroup: 6, bioload: 2, minGallons: 20,
+    habitat: 'A captive-bred form of the bronze cory from South America’s sandy-bottomed streams.',
+    funFact: 'The pink-and-white color and ruby eyes come from a lack of pigment — underneath, it’s the same cheerful catfish, winking and dashing to the surface for gulps of air.',
+    colorTags: ['white', 'pink'],
+    shape: shape({ height: 0.38, width: 0.55, noseSharp: 0.6, tailFork: 0.5, dorsalHeight: 0.55, barbels: true, eyeSize: 0.06 }),
+    palette: pal({ base: '#f0dcc4', belly: '#faf2e2', back: '#e6cbaa', pattern: 'none', fin: '#f4e4cc', finOpacity: 0.5, iridescence: 0.35, eyeColor: '#c03038' }),
+    swim: swim({ cruise: 0.9, burst: 6, freqBase: 2.4, mode: 1, turnRate: 3.0 }), // high burst = rocket air-gulp dashes
   },
   {
     id: 'bristlenose-pleco', common: 'Bristlenose Pleco', scientific: 'Ancistrus cirrhosus',
@@ -200,6 +224,18 @@ export const SPECIES: SpeciesDef[] = [
     shape: shape({ height: 0.11, width: 0.9, noseSharp: 0.5, tailFork: 0, tailSize: 0.08, dorsalHeight: 0.12, analHeight: 0.1, eelLike: true, barbels: true, eyeSize: 0.04 }),
     palette: pal({ base: '#e8a04a', belly: '#f2cea0', back: '#d8903a', pattern: 'vbars', patternColor: '#241c14', patternParams: [9], fin: '#e8b06a', finOpacity: 0.5, iridescence: 0.1 }),
     swim: swim({ cruise: 0.9, freqBase: 2.2, waveLen: 0.62, amp: 0.16, mode: 0, turnRate: 3.6 }),
+  },
+  {
+    id: 'hillstream-loach', common: 'Reticulated Hillstream Loach', scientific: 'Sewellia lineolata',
+    water: 'freshwater', adultSizeIn: 2.5, lengthM: 0.055,
+    temperament: 'peaceful', careLevel: 'moderate', zone: 'bottom', archetype: 'cleaner',
+    minGroup: 1, bioload: 2, minGallons: 20,
+    habitat: 'Fast, shallow, oxygen-rich hillstreams of central Vietnam, clinging to boulders in the torrent.',
+    funFact: 'Its whole underside works like a suction cup — in the wild it holds onto rocks in whitewater, and in a tank it windshield-wipers across the glass grazing algae.',
+    colorTags: ['gold', 'black', 'brown'],
+    shape: shape({ height: 0.13, width: 4.0, noseSharp: 0.15, tailFork: 0.15, tailSize: 0.15, dorsalHeight: 0.22, analHeight: 0.1, eyeSize: 0.05 }),
+    palette: pal({ base: '#c8a458', belly: '#e8d8b8', back: '#a8854a', pattern: 'mottle', patternColor: '#2a2418', fin: '#c8ae6a', finOpacity: 0.75, iridescence: 0.15 }),
+    swim: swim({ cruise: 0.5, burst: 4, freqBase: 2.0, mode: 1, amp: 0.1, turnRate: 3.0 }),
   },
   {
     id: 'cherry-shrimp', common: 'Cherry Shrimp', scientific: 'Neocaridina davidi',
