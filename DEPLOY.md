@@ -11,16 +11,20 @@ Image pushed to ghcr.io/jamisonhill/aquarium:latest (public package)
       ↓
 Watchtower on the NAS polls every 5 minutes, pulls, restarts
       ↓
-Live at http://192.168.0.9:3023/ within ~5–10 minutes
+Live at https://aquarium.duski.org/ within ~5–10 minutes
 ```
+
+If an update shows on the LAN URL but not the public one, it's Cloudflare's
+cache — hard-refresh (Cmd+Shift+R) or purge in the Cloudflare dashboard.
 
 ## Where things live
 
 | Thing | Location |
 |---|---|
+| Live site (public) | https://aquarium.duski.org/ (Cloudflare Tunnel) |
 | Live site (LAN) | http://192.168.0.9:3023/ |
-| Health check | http://192.168.0.9:3023/health |
-| Kiosk / TV mode | http://192.168.0.9:3023/?kiosk=1 |
+| Health check | https://aquarium.duski.org/health |
+| Kiosk / TV mode | https://aquarium.duski.org/?kiosk=1 |
 | GitHub repo | https://github.com/jamisonhill/aquarium |
 | Actions builds | https://github.com/jamisonhill/aquarium/actions |
 | Image registry | ghcr.io/jamisonhill/aquarium (public) |
