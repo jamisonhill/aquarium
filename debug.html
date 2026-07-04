@@ -1,0 +1,67 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>caustic debug</title></head>
+<body style="margin:0">
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { installUnderwaterFog, applyUnderwater, SharedUniforms } from './src/engine/shaders.ts';
+import { substrateTexture } from './src/engine/textures.ts';
+
+installUnderwaterFog();
+const q = new URLSearchParams(location.search);
+const renderer = new THREE.WebGLRenderer();
+if (q.get('tm') !== '0') {
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.18;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+}
+renderer.setSize(800, 600);
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+if (q.get('env') !== '0') {
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.06).texture;
+}
+scene.fog = new THREE.FogExp2('#173f43', Number(q.get('fog') ?? 0.62));
+scene.background = new THREE.Color('#08202c');
+const cam = new THREE.PerspectiveCamera(46, 800/600, 0.01, 50);
+if (q.get('cam') === 'high') { cam.position.set(0, 0.8, 1.2); cam.lookAt(0, 0, 0); }
+else { cam.position.set(0, 0.26, 1.26); cam.lookAt(0, 0.24, 0); }
+scene.add(new THREE.DirectionalLight('#fff2dc', 2.6), new THREE.HemisphereLight('#a8d4e8', '#3a3428', 0.55));
+
+let mat;
+if (q.get('map') === '0') {
+  mat = new THREE.MeshStandardMaterial({ color: '#c8b48c', roughness: 0.95 });
+} else {
+  const tex = substrateTexture('sand');
+  mat = new THREE.MeshStandardMaterial({ map: tex.map, bumpMap: tex.bumpMap, bumpScale: 0.6, roughness: 0.95 });
+}
+applyUnderwater(mat, { caustics: true, causticStrength: 1.9 });
+const orig = mat.onBeforeCompile;
+mat.onBeforeCompile = (shader, r) => {
+  orig(shader, r);
+  window.__frag = shader.fragmentShader;
+  window.__vert = shader.vertexShader;
+};
+const plane = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat);
+plane.rotation.x = -Math.PI/2;
+scene.add(plane);
+SharedUniforms.uSurfaceY.value = 0.5;
+SharedUniforms.uCausticIntensity.value = 1.0;
+
+let t = 0;
+function loop() {
+  t += 0.016;
+  SharedUniforms.uTime.value = t;
+  renderer.render(scene, cam);
+  requestAnimationFrame(loop);
+}
+loop();
+window.__report = () => ({
+  fragHasCaustic: (window.__frag || '').includes('causticPattern'),
+  fragHasInject: (window.__frag || '').includes('uCausticIntensity *'),
+  programs: renderer.info.programs.map(p => p.name),
+  diag: renderer.info.programs.map(p => p.diagnostics ?? null),
+});
+</script>
+</body></html>
