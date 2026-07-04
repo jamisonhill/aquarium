@@ -4,59 +4,61 @@
 - [x] RESEARCH.md complete (engine, locomotion, flora, stocking, assets, perf, audio)
 
 ## Phase 1 — Architecture & Tooling
-- [ ] Vite + React + TypeScript + Zustand scaffold, static output
-- [ ] Three.js engine module decoupled from React
-- [ ] git init, .gitignore, first commit
-- [ ] LICENSES.md
+- [x] Vite + React + TypeScript + Zustand scaffold, static output
+- [x] Three.js engine module decoupled from React
+- [x] git init, .gitignore, commits per phase
+- [x] LICENSES.md
 
 ## Phase 2 — Photorealism Core
-- [ ] PBR + IBL-style lighting, water tint per type
-- [ ] Animated caustics on substrate/fish/plants
-- [ ] Volumetric god-ray light shafts
-- [ ] Per-channel depth color absorption fog (Beer–Lambert)
-- [ ] Water surface (animated, seen from below), glass tank
-- [ ] Substrate options, backgrounds
-- [ ] Marine snow + air-stone bubbles (GPU particles)
-- [ ] Camera: drag/zoom, cinematic drift, "just watch" mode
-- [ ] Quality tiers Low/Med/High/Ultra + auto-detect
+- [x] PBR + IBL lighting (procedural RoomEnvironment), water tint per type
+- [x] Animated caustics on substrate/fish/plants (multiplicative focused-light model)
+- [x] Volumetric god-ray light shafts (billboarded shimmer beams)
+- [x] Per-channel depth color absorption fog (Beer–Lambert)
+- [x] Water surface (procedural waves, glints), glass tank + silicone frame + base
+- [x] Substrate options (4), backgrounds (5)
+- [x] Marine snow + air-stone bubbles (GPU-animated point sprites)
+- [x] Camera: drag/zoom/pinch, cinematic drift, still, follow, idle drift
+- [x] Quality tiers Low/Medium/High/Ultra + auto-detect + runtime downgrade
 
 ## Phase 3 — Living Fish
-- [ ] Procedural fish geometry + species texturing
-- [ ] Vertex-shader swim undulation (freq-coupled speed, banking, Strouhal-valid)
-- [ ] Boids schooling + behavior archetypes (7 types)
-- [ ] Idle behaviors: hover-sculling, darts, resting, foraging
-- [ ] Current field affects fish (rheotaxis)
-- [ ] Stocking capacity + gentle warnings (compatibility, predation, schooling minimums)
-- [ ] Instancing so schools stay 60fps
+- [x] Procedural fish geometry + canvas-painted species textures (29 species)
+- [x] Vertex-shader swim undulation (freq-coupled speed, head recoil, banking, gill pulse)
+- [x] Boids schooling (2.0/0.5/0.5 weights, FOV blind spot) + 8 behavior archetypes
+- [x] Idle behaviors: hover-sculling, darts, resting, foraging, cory air-gulps
+- [x] Current field affects fish (drift + rheotaxis)
+- [x] Stocking capacity (surface-area model) + gentle warnings (9 rule types)
+- [x] One instanced draw call per species
 
 ## Phase 4 — Flora & Cleanup Crew
-- [ ] FW plants: stems, carpet, moss, floating — current-driven sway
-- [ ] SW: pulsing Xenia, anemones, LPS flow, static hard corals, reef rock
-- [ ] Snails grazing glass, shrimp foraging
-- [ ] Decor library incl. ship/castle toggles
+- [x] FW plants: stems, rosettes, carpet, moss, floating — current-driven sway + jet lean
+- [x] SW: pulsing Xenia (self-driven), anemone, LPS flow, soft corals, static hard corals
+- [x] Snails grazing the glass, shrimp, cleaner shrimp stations
+- [x] Decor library incl. ship/castle playful toggles, reef rock, air stone
 
 ## Phase 5 — Visitor Customization
-- [ ] Water type swap (FW/SW libraries, tint, mood)
-- [ ] Tank size slider w/ named presets, scene resize, capacity
-- [ ] Searchable/filterable fish browser + info cards
-- [ ] Plant/coral browser, substrate/background/decor/lighting pickers
-- [ ] Live real-time scene updates
-- [ ] Save/Load/Name tanks (localStorage), randomize, starter presets
+- [x] Water type swap (libraries, tint, substrate, lighting swap + stock clear)
+- [x] Tank size slider 5–180 gal w/ named presets, physical scene resize, capacity
+- [x] Searchable/filterable fish browser + species info cards + fun facts
+- [x] Plant/coral browser, substrate/background/decor/lighting pickers
+- [x] Live real-time scene updates (structure vs stock diffing)
+- [x] Save/Load/Name tanks (localStorage), randomize, 6 starter presets
 
 ## Phase 6 — Extras
-- [ ] Day/night cycle + real-time sync + moonlight mode
-- [ ] Feeding interaction (click surface, flakes sink, fish compete)
-- [ ] Tap-a-fish: camera follow + info card + name your fish
-- [ ] Procedural ambient audio (water bed + bubbler), volume, muted default
-- [ ] Screensaver/kiosk mode, photo mode (download screenshot)
-- [ ] Perf HUD dev toggle
-- [ ] prefers-reduced-motion, keyboard nav, contrast
-- [ ] Responsive + mobile quality fallback
-- [ ] Shareable config URL
+- [x] Day/night cycle + real-time sync + moonlight mode + nocturnal behavior swap
+- [x] Feeding interaction (tap water, flakes float→sink→settle, fish race & compete)
+- [x] Tap-a-fish: camera follow + info card + name your fish
+- [x] Procedural ambient audio (water bed, hum, bubble blips, generative music pad)
+- [x] Screensaver mode + ?kiosk=1, photo mode (PNG download)
+- [x] Perf HUD dev toggle (fps/draw calls/tris/fish)
+- [x] prefers-reduced-motion, keyboard nav + shortcuts, aria labels, focus styles
+- [x] Responsive layout + mobile quality fallback
+- [x] Shareable config URL (base64 in hash)
 
 ## Phase 7 — Verify, Polish, Deploy
-- [ ] Production build passes, tested in browser
-- [ ] All features verified working
-- [ ] README + LICENSES.md + "add a species" guide
-- [ ] Deploy via deploy-static-site-ghcr (Docker → ghcr.io → Watchtower)
-- [ ] Confirm live on NAS, report URL
+- [x] Production build passes (220 KB gzipped)
+- [x] Headless-browser test suite: zero console errors across build/feed/night/reef/resize
+- [x] Visual iteration: particles, fog tuning, caustics program-cache fix, exposure
+- [x] README + LICENSES.md + docs/ADDING-SPECIES.md + DEPLOY.md
+- [x] Deploy: Dockerfile + nginx + GH Actions → ghcr.io → Watchtower on NAS
+- [x] Live on NAS: http://192.168.0.9:3023/ (health: ok)
+- [x] Auto-update loop verified (push → Watchtower swap)
