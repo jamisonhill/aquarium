@@ -1,0 +1,35 @@
+version: '3.9'
+
+# The image is built and pushed to GHCR by GitHub Actions on every push to main.
+# Watchtower polls ghcr.io every 5 minutes and auto-restarts the container
+# when a new image is published — no manual Portainer redeploy needed.
+
+services:
+  aquarium:
+    image: ghcr.io/jamisonhill/aquarium:latest
+    container_name: aquarium
+    ports:
+      - "3023:80"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+    labels:
+      # Tell Watchtower to watch this container for image updates
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower-aquarium
+    restart: unless-stopped
+    volumes:
+      # Needs the Docker socket to inspect and restart containers
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: >
+      --label-enable
+      --cleanup
+      --interval 300
+    # --label-enable  → only watch containers with watchtower.enable=true
+    # --cleanup       → remove old images after updating
+    # --interval 300  → poll every 5 minutes (300 seconds)
