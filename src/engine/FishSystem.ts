@@ -22,9 +22,9 @@ const TAU = Math.PI * 2;
 
 // Global pace dial. The per-species cruise speeds follow published
 // body-lengths-per-second figures, but in a small on-screen tank that reads
-// far too frantic — half speed is much closer to how a real tank feels.
+// far too frantic — a quarter speed is much closer to how a real tank feels.
 // Tail-beat frequency derives from actual speed, so the animation slows with it.
-const SPEED_SCALE = 0.5;
+const SPEED_SCALE = 0.25;
 
 // Surface crawlers stick to the glass/floor instead of swimming freely:
 // snails graze slowly; hillstream loaches cling and scoot in little bursts.
