@@ -81,6 +81,98 @@ export class DecorSystem {
           out.anchors.push(curve.getPoint(0.3), curve.getPoint(0.7));
           break;
         }
+        case 'spider-wood': {
+          // A short trunk with several thin roots fanning up and outward.
+          const wood = this.mat({ map: woodTexture(), color: '#6a5236', roughness: 0.9 });
+          const cx = halfW * 0.35, cz = -halfD * 0.1;
+          const base = new THREE.Vector3(cx, floorY + 0.01, cz);
+          const trunkTop = base.clone().add(new THREE.Vector3(0.02 * scale, dims.height * 0.2, 0.01 * scale));
+          this.group.add(new THREE.Mesh(
+            new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
+              base, base.clone().add(new THREE.Vector3(0, dims.height * 0.09, 0)), trunkTop,
+            ]), 8, 0.014 * scale + 0.005, 6), wood));
+          const spokes = 6;
+          for (let i = 0; i < spokes; i++) {
+            // Fan the branches around the trunk, each reaching to a different height.
+            const ang = (i / spokes) * Math.PI * 2 + 0.5;
+            const spread = 0.12 * scale + 0.04;
+            const h = (0.22 + (i % 3) * 0.06) * dims.height;
+            const tip = new THREE.Vector3(cx + Math.cos(ang) * spread, floorY + h, cz + Math.sin(ang) * spread);
+            const mid = new THREE.Vector3(
+              (trunkTop.x + tip.x) / 2 + Math.cos(ang) * 0.02, (trunkTop.y + tip.y) / 2,
+              (trunkTop.z + tip.z) / 2 + Math.sin(ang) * 0.02);
+            this.group.add(new THREE.Mesh(
+              new THREE.TubeGeometry(new THREE.CatmullRomCurve3([trunkTop, mid, tip]), 8, 0.007 * scale + 0.002, 5), wood));
+            out.anchors.push(tip);
+          }
+          out.obstacles.push({ pos: trunkTop.clone(), radius: 0.07 * scale });
+          out.shelters.push(base.clone().add(new THREE.Vector3(0, 0.02, 0.03)));
+          break;
+        }
+        case 'driftwood-stump': {
+          // A gnarled stump with roots splaying down into the sand.
+          const wood = this.mat({ map: woodTexture(), color: '#5f4a30', roughness: 0.92 });
+          const cx = -halfW * 0.35, cz = halfD * 0.25;
+          const R = 0.06 * scale + 0.02, H = 0.09 * scale + 0.03;
+          const stump = new THREE.Mesh(displace(new THREE.CylinderGeometry(R * 0.85, R, H, 10, 2), 0.12, 3), wood);
+          stump.position.set(cx, floorY + H / 2, cz);
+          this.group.add(stump);
+          const roots = 5;
+          for (let i = 0; i < roots; i++) {
+            const ang = (i / roots) * Math.PI * 2 + 0.3;
+            const reach = R + 0.08 * scale + 0.03;
+            const start = new THREE.Vector3(cx + Math.cos(ang) * R * 0.8, floorY + H * 0.3, cz + Math.sin(ang) * R * 0.8);
+            const end = new THREE.Vector3(cx + Math.cos(ang) * reach, floorY + 0.008, cz + Math.sin(ang) * reach);
+            const mid = new THREE.Vector3((start.x + end.x) / 2, floorY + H * 0.15, (start.z + end.z) / 2);
+            this.group.add(new THREE.Mesh(
+              new THREE.TubeGeometry(new THREE.CatmullRomCurve3([start, mid, end]), 8, 0.01 * scale + 0.003, 5), wood));
+          }
+          out.obstacles.push({ pos: stump.position.clone(), radius: R * 1.3 });
+          out.shelters.push(new THREE.Vector3(cx, floorY + 0.02, cz + R + 0.03)); // hollow beneath the roots
+          out.anchors.push(stump.position.clone().add(new THREE.Vector3(0, H / 2, 0)));
+          break;
+        }
+        case 'hollow-log': {
+          // An open-ended tube lying on its side — DoubleSide so the bore shows.
+          const wood = this.mat({ map: woodTexture(), color: '#7a5c3a', roughness: 0.9, side: THREE.DoubleSide });
+          const R = 0.06 * scale + 0.03, len = 0.26 * scale + 0.08;
+          const cx = halfW * 0.1, cz = halfD * 0.2;
+          const log = new THREE.Mesh(new THREE.CylinderGeometry(R, R * 1.05, len, 14, 1, true), wood);
+          log.rotation.z = Math.PI / 2; // lay the length along X
+          log.rotation.y = 0.2;         // slight angle so it doesn't read as a pipe
+          log.position.set(cx, floorY + R * 0.85, cz);
+          this.group.add(log);
+          // A couple of broken branch stubs poking off the bark for character.
+          for (const [ox, oz, ang] of [[-0.06, 0.02, 0.6], [0.05, -0.03, -0.8]] as const) {
+            const stub = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.012, 0.05 * scale + 0.02, 6), wood);
+            stub.position.set(cx + ox * scale, floorY + R * 1.2, cz + oz * scale);
+            stub.rotation.set(0.4, 0, ang);
+            this.group.add(stub);
+          }
+          out.obstacles.push({ pos: log.position.clone(), radius: R * 1.15 });
+          out.shelters.push(log.position.clone().setY(floorY + R * 0.6)); // inside the bore
+          out.anchors.push(log.position.clone().add(new THREE.Vector3(0, R, 0)));
+          break;
+        }
+        case 'log-arch': {
+          // A hollow log bowed into an archway fish swim under and through.
+          const wood = this.mat({ map: woodTexture(), color: '#6f5232', roughness: 0.9, side: THREE.DoubleSide });
+          const cx = -halfW * 0.2, cz = -halfD * 0.05;
+          const R = 0.05 * scale + 0.022;
+          const foot = 0.14 * scale + 0.05, rise = 0.1 * scale + 0.05, lean = halfD * 0.05;
+          const curve = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(cx - foot, floorY + R * 0.9, cz),
+            new THREE.Vector3(cx - foot * 0.4, floorY + rise, cz + lean),
+            new THREE.Vector3(cx + foot * 0.4, floorY + rise, cz - lean),
+            new THREE.Vector3(cx + foot, floorY + R * 0.9, cz),
+          ]);
+          this.group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 24, R, 12, false), wood));
+          out.obstacles.push({ pos: curve.getPoint(0.06), radius: R * 1.1 }); // footings only,
+          out.obstacles.push({ pos: curve.getPoint(0.94), radius: R * 1.1 }); // leave the arch open
+          out.shelters.push(curve.getPoint(0.5).setY(floorY + R * 0.7));
+          out.anchors.push(curve.getPoint(0.5));
+          break;
+        }
         case 'river-rocks': {
           const rock = this.mat({ map: rockTexture('#5e5852'), roughness: 0.9 });
           for (let i = 0; i < 5; i++) {

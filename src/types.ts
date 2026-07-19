@@ -127,7 +127,7 @@ export interface DecorDef {
   id: string;
   name: string;
   water: WaterType | 'both';
-  kind: 'driftwood' | 'rock' | 'slate' | 'reefrock' | 'ship' | 'castle' | 'airstone';
+  kind: 'driftwood' | 'spiderwood' | 'stump' | 'log' | 'rock' | 'slate' | 'reefrock' | 'ship' | 'castle' | 'airstone';
   playful?: boolean;    // toggled separately in the UI ("playful props")
   info: string;
 }
