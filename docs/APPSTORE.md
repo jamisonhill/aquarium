@@ -58,16 +58,18 @@ export ASC_ISSUER_ID=ff442907-b72c-4ffa-a2d6-e526a6569aa1
 export ASC_KEY_PATH=$HOME/.appstoreconnect/private_keys/AuthKey_JBJW94LBNC.p8
 ```
 
-⚠️ That key can upload builds and metadata, but its role does **not** permit
-creating app records (ASC returns "The resource 'apps' does not allow 'CREATE'").
-So either create the record by hand in ASC → My Apps → **+** (platform iOS, name
-"Living Glass Aquarium", bundle `org.duski.livingglass`, SKU `livingglass`,
-primary language English (U.S.)), or raise the key's role to Admin in ASC →
-Users and Access → Integrations and then run `create_app`.
+⚠️ API keys can upload builds and metadata but **cannot create app records** —
+ASC refuses `CREATE` on `apps` for key auth (confirmed 2026-07-23 with two
+separate keys, so it is not a role problem; `fastlane create_app` only works via
+an Apple ID + 2FA login, which is why it asks for a `username`).
+
+Create the record by hand: ASC → My Apps → **+** → New App — platform *iOS*,
+name **Living Glass Aquarium**, bundle `org.duski.livingglass`, SKU
+`livingglass`, primary language English (U.S.).
 
 ```bash
 cd ios
-fastlane ios create_app     # once — needs an Admin-role key (see above)
+fastlane ios create_app     # only works with Apple ID login — see above
 fastlane ios release        # web build → archive → upload binary+metadata+shots
 fastlane tvos release       # archive tvOS (videos must exist) → upload to same record
 ```

@@ -31,9 +31,10 @@ regenerating.
    made 2026-07-17 for the recipe book is account-wide — Key ID `JBJW94LBNC`,
    issuer `ff442907-b72c-4ffa-a2d6-e526a6569aa1`, file
    `~/.appstoreconnect/private_keys/AuthKey_JBJW94LBNC.p8`. It uploads builds
-   and metadata, but its role cannot CREATE app records, so the record must be
-   made by hand in ASC (or the key raised to Admin). Same situation applies to
-   the Exegesis submission (bibleReading repo).
+   and metadata, but ASC does not allow CREATE on `apps` for key auth at all
+   (verified with two separate keys — not a role issue), so the app record must
+   be made by hand in the ASC web UI. Same applies to the Exegesis submission
+   (bibleReading repo).
 
 ## State snapshot
 - Web app: live at aquarium.duski.org; this session's safe-area CSS fixes and

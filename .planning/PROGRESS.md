@@ -65,8 +65,8 @@ One listing, bundle org.duski.livingglass (universal purchase), team HFAWAP3F3Z.
       `ff442907-b72c-4ffa-a2d6-e526a6569aa1`, file
       `~/.appstoreconnect/private_keys/AuthKey_JBJW94LBNC.p8`). It uploads fine
       but cannot CREATE app records — see docs/APPSTORE.md.
-- [ ] **Jamison (~25 min):** create the ASC app record (by hand in ASC, or raise
-      the key's role to Admin and run `fastlane ios create_app`) →
+- [ ] **Jamison (~25 min):** create the ASC app record by hand in the ASC web UI
+      (API keys cannot create apps — not automatable) →
       `fastlane ios release` + `fastlane tvos release` → privacy questionnaire
       ("Data Not Collected") + Submit both. See docs/APPSTORE.md.
 
