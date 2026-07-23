@@ -36,6 +36,31 @@
 
 ## Post-launch additions
 - [x] Ember tetra, albino corydoras (red eyes), hillstream loach
-- [x] 50% speed reduction; cory air-gulp behavior ← PAUSED HERE (deployed & confirmed live)
+- [x] 50% speed reduction; cory air-gulp behavior (deployed & confirmed live)
+- [x] Honey gourami + zebra oto; driftwood decor; pace 0.25 (later session)
 
-No blockers. Project is feature-complete and live.
+## Phase 8: App Store — "Living Glass Aquarium" (iOS + tvOS) [IN PROGRESS 2026-07-23]
+One listing, bundle org.duski.livingglass (universal purchase), team HFAWAP3F3Z.
+- [x] iOS app (ios/): WKWebView shell over the bundled build via app:// scheme
+      handler (module CORS forbids file://), native share/screenshot bridge,
+      idle-timer off, safe-area CSS fixes (also live on web). Smoke UITest
+      green: engine renders + localStorage persists across relaunch.
+- [x] App icon + 5 App Store screenshots at 1320×2868, all from the real engine.
+- [x] Engine capture mode (#capture=<preset>, fixed-dt external drive,
+      cinematic close-up 0.42) + puppeteer→ffmpeg 4K HEVC seamless-loop
+      pipeline (tail→head crossfade). Verified end-to-end.
+- [x] tvOS app (LivingGlassTV target, same bundle id): scene picker with
+      poster frames, AVPlayerLooper gapless playback, auto-cycle. Verified in
+      the Apple TV 4K simulator with a test loop.
+- [x] fastlane (ios + tvos lanes), full metadata, review notes (4.2 defense),
+      privacy.html; privacy = Data Not Collected.
+- [ ] **6-scene 4K capture running** (capture-all.mjs → ios/LivingGlassTV/Videos,
+      ~3h unattended) → then: xcodegen, tvOS rebuild + soak check, archive both.
+- [ ] **Jamison (~30 min):** ASC API key (.p8) → `fastlane ios create_app` →
+      `fastlane ios release` + `fastlane tvos release` → privacy questionnaire
+      ("Data Not Collected") + Submit both. See docs/APPSTORE.md.
+
+## Phase 9: WebGPU/TSL renderer migration [PLANNED — after submission]
+Plan approved: three ≥r178, single TSL codebase, WebGPURenderer with WebGL2
+backend fallback, phased behind ?renderer= flag (1A version bump → 1B TSL parts
+→ 1C parity flip). Details in the session plan + docs/APPSTORE.md notes.
