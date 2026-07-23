@@ -102,3 +102,20 @@ Both are one-time-per-app, both learned the hard way on 2026-07-23:
 Also: `deliver` uploads each screenshot **twice** — check for duplicates in ASC
 after a run and delete the extras. Re-running `deliver` adds more rather than
 replacing, so the metadata-only lanes pass `skip_screenshots: true`.
+
+## Submission prerequisites ASC won't let you skip
+
+Beyond metadata and a build, ASC blocks "Add for Review" until these are set.
+Everything except pricing can be done through the API (see the session notes):
+
+- **Screenshots for every supported display.** The app ships
+  `TARGETED_DEVICE_FAMILY "1,2"`, so 13-inch iPad shots (2064×2752) are required
+  alongside the 6.9" iPhone set — generate both with
+  `node scripts/store-screens.mjs --device ipad` (dist served at :4174 via
+  `npx vite preview --port 4174`; Python's http.server stalls mid-run).
+- **Privacy policy URL** — https://aquarium.duski.org/privacy.html, set on the
+  app info localization. tvOS reports this separately as "Apple TV Privacy Policy".
+- **Age rating questionnaire** — all none/false for this app; it rates 4+.
+- **Content rights** — `DOES_NOT_USE_THIRD_PARTY_CONTENT` (everything is procedural).
+- **Price tier — Free.** UI only: Apple dropped the `prices` relationship in
+  favor of price schedules and this fastlane version can't set it.

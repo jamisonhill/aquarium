@@ -1,8 +1,12 @@
 // store-screens.mjs — App Store screenshots straight from the engine at exact
-// device pixel sizes (440×956 @3x = 1320×2868, the 6.9" requirement — and the
-// small viewport engages the real mobile layout).
+// device pixel sizes. Rendering at the true CSS viewport (not a scaled-up phone
+// shot) means each size engages the layout real devices get.
 //
-//   node scripts/store-screens.mjs [--out ios/fastlane/screenshots/en-US]
+//   iPhone 6.9": 440×956 @3x  = 1320×2868
+//   iPad 13":   1032×1376 @2x = 2064×2752  (required because the app ships
+//                                           TARGETED_DEVICE_FAMILY "1,2")
+//
+//   node scripts/store-screens.mjs [--device iphone|ipad] [--out DIR]
 // Requires dist served at :4174.
 
 import { mkdirSync } from "node:fs";
@@ -11,6 +15,17 @@ import puppeteer from "puppeteer-core";
 const outIdx = process.argv.indexOf("--out");
 const OUT = outIdx >= 0 ? process.argv[outIdx + 1] : "ios/fastlane/screenshots/en-US";
 mkdirSync(OUT, { recursive: true });
+
+// Device presets. deliver infers the App Store display type from the image
+// dimensions, so both sets can live in the same locale folder.
+const DEVICES = {
+  iphone: { width: 440, height: 956, scale: 3, prefix: "" },
+  ipad: { width: 1032, height: 1376, scale: 2, prefix: "ipad_" },
+};
+const devIdx = process.argv.indexOf("--device");
+const DEVICE_NAME = devIdx >= 0 ? process.argv[devIdx + 1] : "iphone";
+const DEVICE = DEVICES[DEVICE_NAME];
+if (!DEVICE) throw new Error(`unknown --device "${DEVICE_NAME}" (expected iphone or ipad)`);
 
 const HIDE_UI = ".toolbar,.panel,.hud,.toast,.info-card,.open-panel{display:none !important}";
 
@@ -30,7 +45,7 @@ const browser = await puppeteer.launch({
 
 for (const shot of SHOTS) {
   const page = await browser.newPage();
-  await page.setViewport({ width: 440, height: 956, deviceScaleFactor: 3 });
+  await page.setViewport({ width: DEVICE.width, height: DEVICE.height, deviceScaleFactor: DEVICE.scale });
   await page.goto("http://127.0.0.1:4174/", { waitUntil: "networkidle0" });
   await page.waitForFunction("window.__AQUARIUM_READY__ === true", { timeout: 30000 });
 
@@ -62,8 +77,9 @@ for (const shot of SHOTS) {
   await new Promise((r) => setTimeout(r, shot.settle * 1000));
   if (shot.hideUI) await page.addStyleTag({ content: HIDE_UI });
   await new Promise((r) => setTimeout(r, 500));
-  await page.screenshot({ path: `${OUT}/${shot.file}` });
-  console.log("saved", shot.file);
+  const file = `${DEVICE.prefix}${shot.file}`;
+  await page.screenshot({ path: `${OUT}/${file}` });
+  console.log("saved", file, `${DEVICE.width * DEVICE.scale}×${DEVICE.height * DEVICE.scale}`);
   await page.close();
 }
 await browser.close();

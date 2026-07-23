@@ -64,6 +64,23 @@ platform :ios do
       force: true
     )
   end
+
+  desc "Re-upload iOS screenshots only (replaces the whole set)"
+  lane :screenshots do
+    deliver(
+      api_key: asc_api_key,
+      skip_binary_upload: true,
+      skip_metadata: true,
+      # NOTE: deliver uploads every screenshot TWICE, and overwrite_screenshots
+      # does not prevent it (verified 2026-07-23). Dedupe in ASC afterward, or
+      # via Spaceship: delete the second AppScreenshot of each file_name.
+      overwrite_screenshots: true,
+      screenshots_path: "./fastlane/screenshots",
+      precheck_include_in_app_purchases: false,
+      submit_for_review: false,
+      force: true
+    )
+  end
 end
 
 platform :tvos do

@@ -39,6 +39,14 @@ Hermetic release build: fresh web bundle → archive → export
 
 Upload iOS binary + metadata + screenshots
 
+### ios screenshots
+
+```sh
+[bundle exec] fastlane ios screenshots
+```
+
+Re-upload iOS screenshots only (replaces the whole set)
+
 ----
 
 
