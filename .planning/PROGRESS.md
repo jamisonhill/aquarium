@@ -60,7 +60,13 @@ One listing, bundle org.duski.livingglass (universal purchase), team HFAWAP3F3Z.
       verified in the Apple TV 4K sim; tvOS store screenshots captured.
 - [x] **Both platforms archive successfully with signing** (Release,
       -allowProvisioningUpdates). ← PAUSED HERE — everything automated is done.
-- [ ] **Jamison (~30 min):** ASC API key (.p8) → `fastlane ios create_app` →
+- [x] **ASC API key resolved (2026-07-23):** no new key needed — the key created
+      2026-07-17 for the recipe book is account-wide (Key ID `JBJW94LBNC`, issuer
+      `ff442907-b72c-4ffa-a2d6-e526a6569aa1`, file
+      `~/.appstoreconnect/private_keys/AuthKey_JBJW94LBNC.p8`). It uploads fine
+      but cannot CREATE app records — see docs/APPSTORE.md.
+- [ ] **Jamison (~25 min):** create the ASC app record (by hand in ASC, or raise
+      the key's role to Admin and run `fastlane ios create_app`) →
       `fastlane ios release` + `fastlane tvos release` → privacy questionnaire
       ("Data Not Collected") + Submit both. See docs/APPSTORE.md.
 

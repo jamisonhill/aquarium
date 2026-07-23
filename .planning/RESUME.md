@@ -23,11 +23,17 @@ regenerating.
    seam (frame ~50s→0s should be invisible).
 3. Test-archive both schemes (should Just Work — signing verified on this Mac
    via Exegesis; same team HFAWAP3F3Z).
-4. **Then remind Jamison of his ~30 min** (NOT yet done as of pause):
-   ASC API key (.p8) → `fastlane ios create_app` → `fastlane ios release` +
-   `fastlane tvos release` → privacy questionnaire ("Data Not Collected") →
-   Submit both platforms. Full procedure: **docs/APPSTORE.md**. The same API
-   key also unblocks the pending Exegesis submission (bibleReading repo).
+4. **Then remind Jamison of his ~25 min** (NOT yet done as of pause):
+   create the ASC app record → `fastlane ios release` + `fastlane tvos release`
+   → privacy questionnaire ("Data Not Collected") → Submit both platforms.
+   Full procedure: **docs/APPSTORE.md**.
+   **The ASC API key is no longer a blocker** (resolved 2026-07-23): the key
+   made 2026-07-17 for the recipe book is account-wide — Key ID `JBJW94LBNC`,
+   issuer `ff442907-b72c-4ffa-a2d6-e526a6569aa1`, file
+   `~/.appstoreconnect/private_keys/AuthKey_JBJW94LBNC.p8`. It uploads builds
+   and metadata, but its role cannot CREATE app records, so the record must be
+   made by hand in ASC (or the key raised to Admin). Same situation applies to
+   the Exegesis submission (bibleReading repo).
 
 ## State snapshot
 - Web app: live at aquarium.duski.org; this session's safe-area CSS fixes and

@@ -49,12 +49,25 @@ under the 4 GB limit; On-Demand Resources is a future optimization).
 
 ## Release
 
-One-time (Jamison): create the ASC API key (Users and Access → Integrations,
-role App Manager), then `export ASC_KEY_ID=… ASC_ISSUER_ID=… ASC_KEY_PATH=…`.
+**The ASC API key already exists** — created 2026-07-17 for the recipe book app;
+ASC keys are account-wide, so it covers this app too. Verified 2026-07-23:
+
+```bash
+export ASC_KEY_ID=JBJW94LBNC
+export ASC_ISSUER_ID=ff442907-b72c-4ffa-a2d6-e526a6569aa1
+export ASC_KEY_PATH=$HOME/.appstoreconnect/private_keys/AuthKey_JBJW94LBNC.p8
+```
+
+⚠️ That key can upload builds and metadata, but its role does **not** permit
+creating app records (ASC returns "The resource 'apps' does not allow 'CREATE'").
+So either create the record by hand in ASC → My Apps → **+** (platform iOS, name
+"Living Glass Aquarium", bundle `org.duski.livingglass`, SKU `livingglass`,
+primary language English (U.S.)), or raise the key's role to Admin in ASC →
+Users and Access → Integrations and then run `create_app`.
 
 ```bash
 cd ios
-fastlane ios create_app     # once — creates the record "Living Glass Aquarium"
+fastlane ios create_app     # once — needs an Admin-role key (see above)
 fastlane ios release        # web build → archive → upload binary+metadata+shots
 fastlane tvos release       # archive tvOS (videos must exist) → upload to same record
 ```
