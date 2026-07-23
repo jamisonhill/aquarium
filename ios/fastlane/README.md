@@ -60,6 +60,14 @@ Archive + export the tvOS app (scene loops must exist in LivingGlassTV/Videos)
 
 Upload tvOS binary + tvOS screenshots to the same record
 
+### tvos metadata
+
+```sh
+[bundle exec] fastlane tvos metadata
+```
+
+Upload only tvOS metadata + screenshots (no binary)
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.

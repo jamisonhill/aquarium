@@ -90,7 +90,25 @@ platform :tvos do
       platform: "appletvos",
       ipa: "../build/fastlane-tvos/LivingGlassTV.ipa",
       screenshots_path: "./fastlane/screenshots-tvos",
-      skip_metadata: true,   # shared listing text uploads via the iOS lane
+      # App Store Connect keeps a SEPARATE localization per platform version, so
+      # the listing text does not carry over from the iOS lane — tvOS needs its
+      # own copy of the same metadata or the version can't be submitted.
+      metadata_path: "./fastlane/metadata",
+      precheck_include_in_app_purchases: false,
+      submit_for_review: false,
+      force: true
+    )
+  end
+
+  desc "Upload only tvOS metadata + screenshots (no binary)"
+  lane :metadata do
+    deliver(
+      api_key: asc_api_key,
+      platform: "appletvos",
+      skip_binary_upload: true,
+      metadata_path: "./fastlane/metadata",
+      screenshots_path: "./fastlane/screenshots-tvos",
+      skip_screenshots: true,   # already uploaded; re-running duplicates them
       precheck_include_in_app_purchases: false,
       submit_for_review: false,
       force: true

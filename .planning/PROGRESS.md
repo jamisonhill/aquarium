@@ -65,10 +65,17 @@ One listing, bundle org.duski.livingglass (universal purchase), team HFAWAP3F3Z.
       `ff442907-b72c-4ffa-a2d6-e526a6569aa1`, file
       `~/.appstoreconnect/private_keys/AuthKey_JBJW94LBNC.p8`). It uploads fine
       but cannot CREATE app records — see docs/APPSTORE.md.
-- [ ] **Jamison (~25 min):** create the ASC app record by hand in the ASC web UI
-      (API keys cannot create apps — not automatable) →
-      `fastlane ios release` + `fastlane tvos release` → privacy questionnaire
-      ("Data Not Collected") + Submit both. See docs/APPSTORE.md.
+- [x] **ASC app record created** (2026-07-23, by hand in the web UI — API keys
+      cannot create apps). Apple ID `6793975991`, bundle id registered as
+      Universal so one record covers iOS + tvOS.
+- [x] **Both platforms uploaded (2026-07-23):** v1.0.0 build 1 on iOS and tvOS,
+      each attached to its version; 1429-char description, support URL, and
+      screenshots (5 iPhone 6.9", 2 Apple TV) on both; App Review contact set.
+      Precheck clean. Fixed the tvOS lane along the way — it had skipped
+      metadata entirely, leaving the tvOS listing empty.
+- [ ] **Jamison (~10 min):** in ASC — App Privacy questionnaire ("Data Not
+      Collected") for the app, age rating if prompted, then **Submit for
+      Review** on BOTH the iOS and tvOS versions (they submit separately).
 
 ## Phase 9: WebGPU/TSL renderer migration [PLANNED — after submission]
 Plan approved: three ≥r178, single TSL codebase, WebGPURenderer with WebGL2

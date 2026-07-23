@@ -2,3 +2,7 @@ node_modules
 dist
 .DS_Store
 *.local
+
+# Build output — fastlane archives, .ipa, dSYMs (the tvOS ipa alone is ~650MB)
+build/
+ios/fastlane/report.xml

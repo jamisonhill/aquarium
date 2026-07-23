@@ -85,3 +85,20 @@ platform. Review notes live in fastlane/metadata/review_information/notes.txt
 → release lanes. The iOS binary embeds whatever the web build is at archive
 time, so shipping web improvements to the App Store = just re-running
 `fastlane ios release` with a bumped version.
+
+## Two things fastlane does not handle on a new app
+
+Both are one-time-per-app, both learned the hard way on 2026-07-23:
+
+1. **App Review Details must exist before `deliver` runs.** On a brand-new
+   version the record doesn't exist, and fastlane raises a bare `No data`
+   RuntimeError instead of reporting the empty API response. Create it first
+   (contact name/email/phone + notes are in `fastlane/metadata/review_information`).
+2. **A build still processing when `deliver` exits is not attached** to the
+   version. The tvOS bundle is ~650MB, so it is always still processing. Attach
+   it afterward — in the ASC UI, or via Spaceship `version.select_build`.
+   Note the platform value on a *build* is `TV_OS` (not `APPLE_TVOS`).
+
+Also: `deliver` uploads each screenshot **twice** — check for duplicates in ASC
+after a run and delete the extras. Re-running `deliver` adds more rather than
+replacing, so the metadata-only lanes pass `skip_screenshots: true`.
