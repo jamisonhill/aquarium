@@ -1,40 +1,49 @@
-# Resume: Virtual Aquarium
+# Resume: Virtual Aquarium / Living Glass Aquarium
 
-**Paused:** 2026-07-04, late night
-**Reason:** Project complete and live; stepping away after post-launch species batch
-**Phase:** All 7 phases complete + post-launch tweaks shipped
+**Paused:** 2026-07-23, early morning — mid-Phase 8 (App Store), with the
+6-scene 4K capture run still executing in the background.
 
-## State when paused
+## ⚠️ FIRST THING ON RESUME — check the capture run, then finish Phase 8
+1. `ls -la ios/LivingGlassTV/Videos/` — expect SIX ~118MB .mp4 files
+   (reef-lagoon, amazon-community, blackwater-stream, tang-highway,
+   betta-oasis, nano-planted). At pause time 2/6 were done, scene 3 rendering.
+   - Missing some? Serve dist (`cd dist && python3 -m http.server 4174 &`) and
+     `node scripts/capture-scene.mjs <slug> --secs 70 --fps 30 --out ios/LivingGlassTV/Videos`
+     per missing slug (~30 min each), or rerun `scripts/capture-all.mjs`.
+   - ⚠️ reef-lagoon.mp4 must be ~118MB (60s). If it's ~28MB it's the old 14s
+     test loop — recapture it.
+2. `cd ios && xcodegen generate` (videos join the tvOS bundle) → rebuild
+   LivingGlassTV, spot-check playback in the Apple TV 4K sim, scrub a loop
+   seam (frame ~50s→0s should be invisible).
+3. Test-archive both schemes (should Just Work — signing verified on this Mac
+   via Exegesis; same team HFAWAP3F3Z).
+4. **Then remind Jamison of his ~30 min** (NOT yet done as of pause):
+   ASC API key (.p8) → `fastlane ios create_app` → `fastlane ios release` +
+   `fastlane tvos release` → privacy questionnaire ("Data Not Collected") →
+   Submit both platforms. Full procedure: **docs/APPSTORE.md**. The same API
+   key also unblocks the pending Exegesis submission (bibleReading repo).
 
-Everything works and is deployed. **Nothing is in flight** — the final push
-(new species + pacing) was confirmed swapped onto the NAS by Watchtower
-before pausing, and the live site returned 200 afterward.
+## State snapshot
+- Web app: live at aquarium.duski.org; this session's safe-area CSS fixes and
+  the native/capture seams are deployed (push→CI→Watchtower unchanged).
+- iOS app: complete + smoke-tested (ios/, scheme LivingGlass). Icon + five
+  6.9" store screenshots committed (fastlane/screenshots).
+- tvOS app: complete + sim-verified (scheme LivingGlassTV, same bundle id =
+  one listing / universal purchase). Videos are gitignored — regenerate, never
+  commit.
+- fastlane: metadata, review notes (guideline-4.2 defense), both platform lanes.
+- Decision log: name "Living Glass Aquarium"; tvOS = ambient video app (no
+  WKWebView exists on tvOS); WebGPU/TSL migration (Phase 9) deliberately AFTER
+  submission — approved plan summary in PROGRESS.md Phase 9.
 
-## What was working (verified in headless browser, zero console errors)
-- Live at https://aquarium.duski.org and http://192.168.0.9:3023 (health: ok)
-- All 32 species render/behave; new: ember tetra, albino cory (red eyes),
-  hillstream loach (clings to glass, graze/scoot)
-- SPEED_SCALE = 0.5 in src/engine/FishSystem.ts — the single pace dial
-- Cory air-gulp: bottom → rocket to surface (steep pitch) → dive back
+## Key invariants (don't break)
+- Vite `base: './'`, zero runtime network, all-procedural assets — the iOS
+  scheme handler and offline claim depend on this.
+- window.__NATIVE_IOS__ / __AQUARIUM_READY__ / #capture= seams (docs/APPSTORE.md
+  lists all of them with file paths).
 
-## Key decisions this session
-- Fish pace: real body-lengths/sec reads frantic on screen → global 0.5 scale
-- Hillstream loach reuses the snail wall-crawler (isCrawler()) with per-species
-  speed + graze/scoot modes; snail speed made dt-correct (was frame-dependent)
-- eyeColor added to FishPalette for albino red eyes
-
-## Likely next steps (nothing committed to)
-- Watch the tank on a real GPU and re-judge pace (SPEED_SCALE is the dial)
-- More species on request — docs/ADDING-SPECIES.md is the guide
-- Possible future: WebGPU renderer, glTF model swap-in (touches FishFactory only)
-
-## How to restart dev
+## Dev quickstart
 ```bash
-cd ~/Ai/Personal/aquarium
-npm run dev          # local dev at :5173
-npm run build        # must pass before pushing
-git push origin main # → live in ~5–10 min via Actions + Watchtower
+npm run dev                      # web at :5173
+cd ios && xcodegen generate      # then build/test in Xcode or xcodebuild
 ```
-Headless verification scripts from this session live in the (ephemeral)
-session scratchpad; the pattern is documented in project memory. DEPLOY.md
-covers all operations.
