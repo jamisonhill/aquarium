@@ -1,0 +1,76 @@
+# XcodeGen spec for Living Glass Aquarium (iOS now; the tvOS target joins in
+# the next phase, sharing the same bundle id for universal purchase).
+# Run `xcodegen generate` here after cloning or when this file changes.
+name: LivingGlass
+options:
+  bundleIdPrefix: org.duski
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: HFAWAP3F3Z   # Jamison Hill
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+
+targets:
+  LivingGlass:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: LivingGlass
+    preBuildScripts:
+      - name: Embed web build
+        script: |
+          "$SRCROOT/scripts/embed-web.sh"
+        basedOnDependencyAnalysis: false
+        outputFiles:
+          - $(DERIVED_FILE_DIR)/embed-web-ran
+    info:
+      path: LivingGlass/Info.plist
+      properties:
+        CFBundleDisplayName: Living Glass
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        UIStatusBarHidden: true
+        UIViewControllerBasedStatusBarAppearance: false
+        UIRequiresFullScreen: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.duski.livingglass
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+
+  LivingGlassUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: LivingGlassUITests
+    dependencies:
+      - target: LivingGlass
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  LivingGlass:
+    build:
+      targets:
+        LivingGlass: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - LivingGlassUITests
+    archive:
+      config: Release

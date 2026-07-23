@@ -3,6 +3,7 @@
 import { useStore } from '../state/store';
 import { getEngine } from '../engine/engineRef';
 import { audioEngine } from '../audio/AudioEngine';
+import { isNativeIOS, nativeSaveImage } from '../platform/native';
 
 export function Toolbar() {
   const feedMode = useStore((s) => s.feedMode);
@@ -19,6 +20,9 @@ export function Toolbar() {
     if (!engine) return;
     // Briefly hidden UI isn't needed — the canvas capture never includes DOM UI.
     const url = engine.screenshot();
+    // In the iOS app an <a download> click does nothing — hand the PNG to the
+    // native share sheet instead.
+    if (isNativeIOS() && nativeSaveImage(url)) return;
     const a = document.createElement('a');
     a.href = url;
     a.download = `aquarium-${(config.name || 'tank').replace(/\s+/g, '-').toLowerCase()}.png`;
@@ -66,13 +70,17 @@ export function Toolbar() {
         data-tip="Screensaver — hide everything (H)"
         onClick={() => set({ uiHidden: true, cameraMode: 'cinematic', panelOpen: false, selectedFishKey: null, followFishKey: null })}
       >🖥️</button>
-      <button
-        data-tip="Fullscreen"
-        onClick={() => {
-          if (document.fullscreenElement) void document.exitFullscreen();
-          else void document.documentElement.requestFullscreen?.();
-        }}
-      >⛶</button>
+      {/* The Fullscreen API doesn't exist in the iOS app's web view — and the
+          app is already full-screen there — so the button only renders on web. */}
+      {!isNativeIOS() && (
+        <button
+          data-tip="Fullscreen"
+          onClick={() => {
+            if (document.fullscreenElement) void document.exitFullscreen();
+            else void document.documentElement.requestFullscreen?.();
+          }}
+        >⛶</button>
+      )}
       {!panelOpen && (
         <button data-tip="Build your tank" onClick={() => set({ panelOpen: true })}>🛠️</button>
       )}

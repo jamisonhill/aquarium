@@ -9,6 +9,7 @@ import { decorForWater } from '../data/decor';
 import { MIN_GALLONS, MAX_GALLONS, tankDims, presetNameFor, TANK_PRESETS } from '../data/tanks';
 import { stockingWarnings, totalBioload } from '../data/compatibility';
 import { encodeShareUrl } from '../state/share';
+import { isNativeIOS, nativeShare } from '../platform/native';
 import type { SpeciesDef, FloraDef } from '../types';
 
 type Tab = 'tank' | 'fish' | 'flora' | 'decor' | 'saved' | 'settings';
@@ -431,6 +432,8 @@ function SavedTab() {
           className="btn"
           onClick={async () => {
             const url = encodeShareUrl(config);
+            // iOS app: the native share sheet beats a silent clipboard write.
+            if (isNativeIOS() && nativeShare(url)) return;
             try {
               await navigator.clipboard.writeText(url);
               showToast('Share link copied — send it to a friend and they’ll see this exact tank.');

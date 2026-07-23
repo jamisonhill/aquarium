@@ -12,6 +12,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import type { QualityTier, TankConfig } from '../types';
 import { tankDims } from '../data/tanks';
 import { installUnderwaterFog, SharedUniforms } from './shaders';
+import { markReady } from '../platform/native';
 import { QUALITY, detectQuality, type QualitySettings } from './quality';
 import { CameraRig } from './CameraRig';
 import { CurrentField } from './CurrentField';
@@ -48,6 +49,7 @@ export class Engine {
   private dayFactor = 1;
   private raycaster = new THREE.Raycaster();
   private running = true;
+  private firstFrameDone = false;
   private disposed = false;
   private frameTimes: number[] = [];
   private feedMode = false;
@@ -344,6 +346,12 @@ export class Engine {
 
     if (this.composer) this.composer.render();
     else this.renderer.render(this.scene, this.rig.camera);
+
+    // First rendered frame → readiness flag (polled by the iOS app's tests).
+    if (!this.firstFrameDone) {
+      this.firstFrameDone = true;
+      markReady();
+    }
 
     // — Stats + automatic quality downgrade —
     this.frameTimes.push(dt);
