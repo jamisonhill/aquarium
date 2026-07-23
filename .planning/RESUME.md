@@ -3,7 +3,12 @@
 **Paused:** 2026-07-23, early morning — mid-Phase 8 (App Store), with the
 6-scene 4K capture run still executing in the background.
 
-## ⚠️ FIRST THING ON RESUME — check the capture run, then finish Phase 8
+## ⚠️ FIRST THING ON RESUME — only Jamison's ASC steps remain
+Everything automated is DONE (captures, tvOS bundle, seam check, both archives).
+Skip to step 4 below. Steps 1–3 kept only as reference if scenes ever need
+regenerating.
+
+## (reference) Capture/verify procedure
 1. `ls -la ios/LivingGlassTV/Videos/` — expect SIX ~118MB .mp4 files
    (reef-lagoon, amazon-community, blackwater-stream, tang-highway,
    betta-oasis, nano-planted). At pause time 2/6 were done, scene 3 rendering.

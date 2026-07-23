@@ -54,9 +54,12 @@ One listing, bundle org.duski.livingglass (universal purchase), team HFAWAP3F3Z.
       the Apple TV 4K simulator with a test loop.
 - [x] fastlane (ios + tvos lanes), full metadata, review notes (4.2 defense),
       privacy.html; privacy = Data Not Collected.
-- [ ] **6-scene 4K capture** ← PAUSED HERE (2026-07-23; run was at 2/6 done and
-      still executing — verify per RESUME.md step 1) → then: xcodegen, tvOS
-      rebuild + soak check, archive both.
+- [x] 6-scene 4K capture COMPLETE (3.2h, six 60.0s loops, 100–120MB each).
+      Seam verified (mean pixel delta 2.30 across the wrap — invisible).
+- [x] tvOS rebuilt with all six scenes (652MB debug bundle), picker + playback
+      verified in the Apple TV 4K sim; tvOS store screenshots captured.
+- [x] **Both platforms archive successfully with signing** (Release,
+      -allowProvisioningUpdates). ← PAUSED HERE — everything automated is done.
 - [ ] **Jamison (~30 min):** ASC API key (.p8) → `fastlane ios create_app` →
       `fastlane ios release` + `fastlane tvos release` → privacy questionnaire
       ("Data Not Collected") + Submit both. See docs/APPSTORE.md.
