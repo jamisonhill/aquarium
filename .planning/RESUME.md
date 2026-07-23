@@ -1,7 +1,8 @@
 # Resume: Virtual Aquarium / Living Glass Aquarium
 
-**Paused:** 2026-07-23, early morning — mid-Phase 8 (App Store), with the
-6-scene 4K capture run still executing in the background.
+**Paused:** 2026-07-23 — Phase 8 automated work 100% complete (all six 4K
+loops rendered + seam-verified, tvOS bundled + sim-verified, both platforms
+archive with signing). Waiting solely on Jamison's App Store Connect steps.
 
 ## ⚠️ FIRST THING ON RESUME — only Jamison's ASC steps remain
 Everything automated is DONE (captures, tvOS bundle, seam check, both archives).

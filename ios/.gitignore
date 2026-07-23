@@ -4,3 +4,4 @@ DerivedData/
 build/
 xcuserdata/
 *.xcuserstate
+report.xml
