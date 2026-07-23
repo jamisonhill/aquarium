@@ -73,9 +73,13 @@ One listing, bundle org.duski.livingglass (universal purchase), team HFAWAP3F3Z.
       screenshots (5 iPhone 6.9", 2 Apple TV) on both; App Review contact set.
       Precheck clean. Fixed the tvOS lane along the way — it had skipped
       metadata entirely, leaving the tvOS listing empty.
-- [ ] **Jamison (~10 min):** in ASC — App Privacy questionnaire ("Data Not
-      Collected") for the app, age rating if prompted, then **Submit for
-      Review** on BOTH the iOS and tvOS versions (they submit separately).
+- [x] **Submitted for review 2026-07-23** — both iOS and tvOS v1.0.0 build 1 are
+      WAITING_FOR_REVIEW. Cleared the five ASC prerequisites first: 13" iPad
+      screenshots (2064x2752), privacy policy URL, age rating questionnaire
+      (rates 4+), content rights, and price tier Free.
+
+## <- PAUSED HERE (2026-07-23) - awaiting App Review on both platforms.
+Nothing is blocked on us. Next work is Phase 9 below, once review clears.
 
 ## Phase 9: WebGPU/TSL renderer migration [PLANNED — after submission]
 Plan approved: three ≥r178, single TSL codebase, WebGPURenderer with WebGL2
