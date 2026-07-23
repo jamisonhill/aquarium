@@ -61,6 +61,28 @@ targets:
       base:
         GENERATE_INFOPLIST_FILE: YES
 
+  # tvOS: ambient pre-rendered 4K loops of the same tanks. SAME bundle id as
+  # the iOS app → both binaries attach to one App Store record (universal
+  # purchase). Loop videos live in LivingGlassTV/Videos/ (gitignored, ~120MB
+  # each — regenerate with scripts/capture-scene.mjs, then `xcodegen generate`).
+  LivingGlassTV:
+    type: application
+    platform: tvOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: LivingGlassTV
+    info:
+      path: LivingGlassTV/Info.plist
+      properties:
+        CFBundleDisplayName: Living Glass
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.duski.livingglass
+        ASSETCATALOG_COMPILER_APPICON_NAME: App Icon & Top Shelf Image
+
 schemes:
   LivingGlass:
     build:
@@ -72,5 +94,14 @@ schemes:
       config: Debug
       targets:
         - LivingGlassUITests
+    archive:
+      config: Release
+
+  LivingGlassTV:
+    build:
+      targets:
+        LivingGlassTV: all
+    run:
+      config: Debug
     archive:
       config: Release

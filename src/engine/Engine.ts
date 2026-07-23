@@ -329,6 +329,20 @@ export class Engine {
     if (this.disposed) return;
     const dt = Math.min(this.clock.getDelta(), 0.1);
     if (!this.running) return;
+    this.advance(dt);
+  };
+
+  /**
+   * Detach from requestAnimationFrame so an external driver (the tvOS video
+   * capture script) can step the simulation frame-by-frame with a fixed dt.
+   */
+  enableExternalDrive(): void {
+    this.renderer.setAnimationLoop(null);
+  }
+
+  /** One simulation + render step. Called with real dt by tick(), or with a
+   *  fixed dt by the capture driver (which needs stutter-free frame times). */
+  advance(dt: number): void {
 
     const t = SharedUniforms.uTime.value + dt;
     SharedUniforms.uTime.value = t;

@@ -1,0 +1,11 @@
+Living Glass Aquarium — notes for review:
+
+1. FIRST-PARTY ENGINE, NOT A REPACKAGED WEBSITE. The iOS app embeds our own real-time 3D aquarium simulation engine (WebGL/Three.js, ~800KB, entirely procedural — no downloaded assets). It runs fully offline: the binary contains no networking code, loads no remote content, and functions in airplane mode. The web deployment at aquarium.duski.org is a demo of the same first-party engine, not a separate product being wrapped.
+
+2. NATIVE INTEGRATION: native share sheet for tank-share links and photo export, idle-timer control (screensaver use), safe-area-aware layout, and a native tvOS sibling app under this same purchase — six 4K ambient scenes pre-rendered from the same engine (tvOS has no web runtime, so scenes ship as video).
+
+3. PRIVACY: the app collects nothing — no accounts, analytics, ads, or tracking. Privacy nutrition label is "Data Not Collected."
+
+4. No purchases, no subscriptions. Free.
+
+Suggested quick tour (iPhone): tap 🛠️ to open the tank builder → pick "Reef Lagoon" → tap 🫘 and tap the water to feed → tap any fish to meet and follow it → 🖥️ enters screensaver mode (tap to exit).

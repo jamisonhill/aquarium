@@ -1,0 +1,94 @@
+# Fastfile — Living Glass Aquarium release lanes (iOS + tvOS, one ASC record).
+#
+# One-time prerequisite (Jamison): App Store Connect API key —
+#   export ASC_KEY_ID=… ASC_ISSUER_ID=… ASC_KEY_PATH=~/.appstoreconnect/AuthKey_….p8
+#
+# Then from ios/:
+#   fastlane ios create_app      # once: creates the ASC record (also enables tvOS)
+#   fastlane ios release         # iOS: build fresh web bundle, archive, upload all
+#   fastlane tvos release        # tvOS: archive + upload (needs Videos/*.mp4 present)
+
+default_platform(:ios)
+
+def asc_api_key
+  app_store_connect_api_key(
+    key_id: ENV.fetch("ASC_KEY_ID"),
+    issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+    key_filepath: ENV.fetch("ASC_KEY_PATH")
+  )
+end
+
+platform :ios do
+  desc "Create the App Store Connect app record (run once)"
+  lane :create_app do
+    produce(
+      api_key: asc_api_key,
+      app_identifier: "org.duski.livingglass",
+      app_name: "Living Glass Aquarium",
+      language: "en-US",
+      app_version: "1.0.0",
+      sku: "livingglass"
+    )
+    # tvOS rides on the same record; enable the platform in ASC the first time
+    # a tvOS binary uploads (deliver handles it), or toggle it in the ASC UI.
+  end
+
+  desc "Hermetic release build: fresh web bundle → archive → export"
+  lane :build_release do
+    sh("cd ../.. && npm ci && npm run build")
+    sh("cd .. && xcodegen generate")
+    build_app(
+      project: "../LivingGlass.xcodeproj",
+      scheme: "LivingGlass",
+      export_method: "app-store-connect",
+      output_directory: "../build/fastlane-ios",
+      xcargs: "-allowProvisioningUpdates SKIP_WEB_BUILD=1"
+    )
+  end
+
+  desc "Upload iOS binary + metadata + screenshots"
+  lane :release do
+    build_release
+    deliver(
+      api_key: asc_api_key,
+      ipa: "../build/fastlane-ios/LivingGlass.ipa",
+      metadata_path: "./metadata",
+      screenshots_path: "./screenshots",
+      precheck_include_in_app_purchases: false,
+      submit_for_review: false,
+      force: true
+    )
+  end
+end
+
+platform :tvos do
+  desc "Archive + export the tvOS app (scene loops must exist in LivingGlassTV/Videos)"
+  lane :build_release do
+    videos = Dir.glob("../LivingGlassTV/Videos/*.mp4")
+    UI.user_error!("No scene loops in LivingGlassTV/Videos — run scripts/capture-all.mjs first") if videos.empty?
+    UI.message("Bundling #{videos.length} scene loop(s)")
+    sh("cd .. && xcodegen generate")
+    build_app(
+      project: "../LivingGlass.xcodeproj",
+      scheme: "LivingGlassTV",
+      export_method: "app-store-connect",
+      output_directory: "../build/fastlane-tvos",
+      xcargs: "-allowProvisioningUpdates"
+    )
+  end
+
+  desc "Upload tvOS binary + tvOS screenshots to the same record"
+  lane :release do
+    build_release
+    deliver(
+      api_key: asc_api_key,
+      platform: "appletvos",
+      ipa: "../build/fastlane-tvos/LivingGlassTV.ipa",
+      screenshots_path: "./screenshots-tvos",
+      skip_metadata: true,   # shared listing text uploads via the iOS lane
+      precheck_include_in_app_purchases: false,
+      submit_for_review: false,
+      force: true
+    )
+  end
+end

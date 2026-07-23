@@ -1,0 +1,5 @@
+# Appfile — Living Glass Aquarium (iOS + tvOS share this identifier: one App
+# Store record, universal purchase). ASC API key via env, never committed:
+#   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH
+app_identifier "org.duski.livingglass"
+team_id "HFAWAP3F3Z"
