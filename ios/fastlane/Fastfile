@@ -43,9 +43,9 @@ platform :ios do
     sh("cd ../.. && npm ci && npm run build")
     sh("cd .. && xcodegen generate")
     build_app(
-      project: "../LivingGlass.xcodeproj",
+      project: "LivingGlass.xcodeproj",
       scheme: "LivingGlass",
-      export_method: "app-store-connect",
+      export_method: "app-store",
       output_directory: "../build/fastlane-ios",
       xcargs: "-allowProvisioningUpdates SKIP_WEB_BUILD=1"
     )
@@ -57,8 +57,8 @@ platform :ios do
     deliver(
       api_key: asc_api_key,
       ipa: "../build/fastlane-ios/LivingGlass.ipa",
-      metadata_path: "./metadata",
-      screenshots_path: "./screenshots",
+      metadata_path: "./fastlane/metadata",
+      screenshots_path: "./fastlane/screenshots",
       precheck_include_in_app_purchases: false,
       submit_for_review: false,
       force: true
@@ -74,9 +74,9 @@ platform :tvos do
     UI.message("Bundling #{videos.length} scene loop(s)")
     sh("cd .. && xcodegen generate")
     build_app(
-      project: "../LivingGlass.xcodeproj",
+      project: "LivingGlass.xcodeproj",
       scheme: "LivingGlassTV",
-      export_method: "app-store-connect",
+      export_method: "app-store",
       output_directory: "../build/fastlane-tvos",
       xcargs: "-allowProvisioningUpdates"
     )
@@ -89,7 +89,7 @@ platform :tvos do
       api_key: asc_api_key,
       platform: "appletvos",
       ipa: "../build/fastlane-tvos/LivingGlassTV.ipa",
-      screenshots_path: "./screenshots-tvos",
+      screenshots_path: "./fastlane/screenshots-tvos",
       skip_metadata: true,   # shared listing text uploads via the iOS lane
       precheck_include_in_app_purchases: false,
       submit_for_review: false,
