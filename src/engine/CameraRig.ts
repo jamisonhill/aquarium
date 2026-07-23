@@ -176,4 +176,14 @@ export class CameraRig {
     this.tLookAt.set(0, midY, 0);
     this.followTarget = null;
   }
+
+  /**
+   * Pull the camera in toward the glass for an immersive, full-bleed framing
+   * (used by the ambient/tvOS capture). fraction 0 = as close as allowed,
+   * 1 = keep the current whole-tank framing.
+   */
+  closeUp(fraction: number): void {
+    this.tRadius = THREE.MathUtils.lerp(this.minR, this.tRadius, THREE.MathUtils.clamp(fraction, 0, 1));
+    this.radius = this.tRadius; // snap — capture starts immediately
+  }
 }

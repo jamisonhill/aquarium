@@ -340,6 +340,11 @@ export class Engine {
     this.renderer.setAnimationLoop(null);
   }
 
+  /** Immersive close framing for ambient capture (see CameraRig.closeUp). */
+  cinematicCloseUp(fraction: number): void {
+    this.rig.closeUp(fraction);
+  }
+
   /** One simulation + render step. Called with real dt by tick(), or with a
    *  fixed dt by the capture driver (which needs stutter-free frame times). */
   advance(dt: number): void {

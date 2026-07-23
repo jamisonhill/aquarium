@@ -18,6 +18,7 @@ export interface CaptureParams {
 declare global {
   interface Window {
     __step?: (dt: number) => void;
+    __closeUp?: (fraction: number) => void;
     __captureInfo?: CaptureParams & { presetName: string };
   }
 }
@@ -51,8 +52,12 @@ export function bootCapture(params: CaptureParams): void {
   // across the loop and fight the seam crossfade.
   engine.applyConfig({ ...preset, dayNight: 'day' });
   engine.setCameraMode('cinematic');
+  // Full-bleed underwater framing — an exterior product shot of the glass box
+  // reads wrong on a TV. Tuned via the __closeUp hook below.
+  engine.cinematicCloseUp(0.42);
   engine.enableExternalDrive();
 
   window.__step = (dt: number) => engine.advance(dt);
+  window.__closeUp = (f: number) => engine.cinematicCloseUp(f);
   window.__captureInfo = { ...params, presetName: preset.name };
 }
